@@ -7,6 +7,7 @@ import time
 import pickle
 from random import randrange
 from copy import copy 
+from pathlib import Path
 
 class tweet:
     def __init__(self, link, text, username, nquote, nlike, nretweet, nreply, father=""):
@@ -101,8 +102,6 @@ def find_not_passed():
         if tweet_dict[i].passed == False and tweet_dict[i].nreply > 0:
             return tweet_dict[i]
     return None
-    
-#https://xcancel.com/epenser/status/1925526554299306300#m
 
 def escape(input_string):
     # Convertit chaque caractère non-ASCII en sa représentation %xx
@@ -120,10 +119,6 @@ def atob(base64_string):
 
 def decode(str):
     return decodeURIComponent(escape(atob(str)))
-
-#str = "dmFyIGNoZWNrMSA9IHsiZGV0ZWN0aW9ucyIgOiBbXX07KGZ1bmN0aW9uKCl7CiAgdmFyIGEgPSBmdW5jdGlvbigpIHt0cnl7cmV0dXJuICEhd2luZG93LmFkZEV2ZW50TGlzdGVuZXJ9IGNhdGNoKGUpIHtyZXR1cm4gITF9IH0sCiAgYiA9IGZ1bmN0aW9uKGIsIGMpIHthKCkgPyBkb2N1bWVudC5hZGRFdmVudExpc3RlbmVyKCJET01Db250ZW50TG9hZGVkIiwgYiwgYykgOiBkb2N1bWVudC5hdHRhY2hFdmVudCgib25yZWFkeXN0YXRlY2hhbmdlIiwgYil9OwogIGIoZnVuY3Rpb24oKXsKICAgIHZhciB0aW1lbGVmdCA9IDE7CiAgICB2YXIgZG93bmxvYWRUaW1lciA9IHNldEludGVydmFsKGZ1bmN0aW9uKCl7CiAgICAgIHRpbWVsZWZ0LS07CiAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCJjb3VudGRvd250aW1lciIpLnRleHRDb250ZW50ID0gdGltZWxlZnQ7CiAgICAgIGlmKHRpbWVsZWZ0IDw9IDApCiAgICAgIGNsZWFySW50ZXJ2YWwoZG93bmxvYWRUaW1lcik7CiAgICB9LDEwMDApOwogICAgc2V0VGltZW91dChmdW5jdGlvbigpewogICAgICB2YXIgbm93ID0gbmV3IERhdGUoKTsKICAgICAgdmFyIHRpbWUgPSBub3cuZ2V0VGltZSgpOwogICAgICB0aW1lICs9IDMwMCAqIDEwMDA7CiAgICAgIG5vdy5zZXRUaW1lKHRpbWUpOwogICAgICBkb2N1bWVudC5jb29raWUgPSAnT2VtdHlvc3JTMVkxeVBvSTlBM3RzMFRna3hVPXYxWFZKeC1jcmxlcEw1SjFLd0ppdlVPTUdwdycgKyAnOyBleHBpcmVzPScgKyAnU2F0LCAxNy1NYXktMjUgMTU6NDA6MDUgR01UJyArICc7IHBhdGg9Lyc7CiAgICAgIHZhciBib3RkUHJvbWlzZSA9IEJvdEQubG9hZCgpCiAgICAgIHZhciBib3RFeGNlcHRpb24gPSBmYWxzZTsKICAgICAgdmFyIHVhcCA9IG5ldyBVQVBhcnNlcigpOwogICAgICBib3RkUHJvbWlzZQogICAgICAgIC50aGVuKGZ1bmN0aW9uIChmcCkgewogICAgICAgICAgICByZXR1cm4gZnAuZGV0ZWN0KCk7CiAgICAgICAgICB9KQogICAgICAgIC50aGVuKGZ1bmN0aW9uIChyZXN1bHQpIHsKICAgICAgICAgIHZhciBmcFdvcmtlclZhbGlkYXRlID0gZmFsc2U7CiAgICAgICAgICBpZiAoInNlcnZpY2VXb3JrZXIiIGluIG5hdmlnYXRvcikgewogICAgICAgICAgICBmcHdvcmtlci50aGVuKGZ1bmN0aW9uIChyZXN1bHQpIHsKICAgICAgICAgICAgICB2YXIgd2luZG93U2NvcGVVc2VyQWdlbnQgPSB1YXAuc2V0VUEocmVzdWx0LndpbmRvd1Njb3BlLnVzZXJBZ2VudCkuZ2V0UmVzdWx0KCk7CiAgICAgICAgICAgICAgdmFyIHNlcnZpY2V3b3JrZXJVc2VyQWdlbnQgPSB1YXAuc2V0VUEocmVzdWx0LnNlcnZpY2VXb3JrZXIudXNlckFnZW50KS5nZXRSZXN1bHQoKTsKICAgICAgICAgICAgICBpZiAocmVzdWx0LnNlcnZpY2VXb3JrZXIgPT09IHVuZGVmaW5lZCAmJiAic2hhcmVkV29ya2VyIiBpbiBuYXZpZ2F0b3IgPT09IGZhbHNlKSB7CiAgICAgICAgICAgICAgICBmcFdvcmtlclZhbGlkYXRlID0gdHJ1ZTsKICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgaWYgKEpTT04uc3RyaW5naWZ5KHdpbmRvd1Njb3BlVXNlckFnZW50LmVuZ2luZSkgPT09IEpTT04uc3RyaW5naWZ5KHNlcnZpY2V3b3JrZXJVc2VyQWdlbnQuZW5naW5lKQogICAgICAgICAgICAgICAgJiYgcmVzdWx0LndpbmRvd1Njb3BlLmVuZ2luZSA9PT0gcmVzdWx0LnNlcnZpY2VXb3JrZXIuZW5naW5lCiAgICAgICAgICAgICAgICAmJiByZXN1bHQud2luZG93U2NvcGUudGltZVpvbmUgPT09IHJlc3VsdC5zZXJ2aWNlV29ya2VyLnRpbWVab25lKSB7CiAgICAgICAgICAgICAgICAgIGZwV29ya2VyVmFsaWRhdGUgPSB0cnVlOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9KS5jYXRjaChmdW5jdGlvbiAocmVzdWx0KSB7CiAgICAgICAgICAgICAgZnBXb3JrZXJWYWxpZGF0ZSA9IHRydWU7CiAgICAgICAgICAgIH0pCiAgICAgICAgICB9IGVsc2UgewogICAgICAgICAgICBmcFdvcmtlclZhbGlkYXRlID0gdHJ1ZTsKICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgc2V0VGltZW91dChmdW5jdGlvbiAoKSB7CiAgICAgICAgICAgIGlmICgoIXJlc3VsdC5ib3QgfHwgcmVzdWx0LmJvdEtpbmQgPT09ICd1bmtub3duJykgJiYgY2hlY2sxLmRldGVjdGlvbnMubGVuZ3RoID09IDAgJiYgZnBXb3JrZXJWYWxpZGF0ZSA9PSB0cnVlKSB7CiAgICAgICAgICAgICAgaWYoIXdpbmRvdy5fcGhhbnRvbSB8fCAhd2luZG93LmNhbGxQaGFudG9tKXsvKnBoYW50b21qcyovCmlmKCF3aW5kb3cuX19waGFudG9tYXMpey8qcGhhbnRvbWFzIFBoYW50b21KUy1iYXNlZCB3ZWIgcGVyZiBtZXRyaWNzICsgbW9uaXRvcmluZyB0b29sKi8KaWYoIXdpbmRvdy5CdWZmZXIpey8qbm9kZWpzKi8KaWYoIXdpbmRvdy5lbWl0KXsvKmNvdWNoanMqLwppZighd2luZG93LnNwYXduKXsvKnJoaW5vKi8KaWYoIXdpbmRvdy53ZWJkcml2ZXIpey8qc2VsZW5pdW0qLwppZighd2luZG93LmRvbUF1dG9tYXRpb24gfHwgIXdpbmRvdy5kb21BdXRvbWF0aW9uQ29udHJvbGxlcil7LypjaHJvbWl1bSBiYXNlZCBhdXRvbWF0aW9uIGRyaXZlciovCmlmKCF3aW5kb3cuZG9jdW1lbnQuZG9jdW1lbnRFbGVtZW50LmdldEF0dHJpYnV0ZSgid2ViZHJpdmVyIikpewovKmlmKG5hdmlnYXRvci51c2VyQWdlbnQpeyovCmlmKCEvYm90fGN1cmx8a29kaXx4Ym1jfHdnZXR8dXJsbGlifHB5dGhvbnx3aW5odHRwfGh0dHJhY2t8YWxleGF8aWFfYXJjaGl2ZXJ8ZmFjZWJvb2t8dHdpdHRlcnxsaW5rZWRpbnxwaW5nZG9tL2kudGVzdChuYXZpZ2F0b3IudXNlckFnZW50KSl7Ci8qaWYobmF2aWdhdG9yLmNvb2tpZUVuYWJsZWQpeyovCi8qaWYoZG9jdW1lbnQuY29va2llLm1hdGNoKC9eKD86Lio7KT9ccypbMC05YS1mXXszMn1ccyo9XHMqKFteO10rKSg/Oi4qKT8kLykpeyovLypIdHRwT25seSBDb29raWUgZmxhZ3MgcHJldmVudCB0aGlzKi8KICAgICAgICAgICAgICB2YXIgXzAwOV85NDkyPXBhcnNlSW50KCIyMDI1MDUxNiIsIDEwKSArIHBhcnNlSW50KCIxNjA1MjAyNSIsIDEwKTsKICAgICAgICAgICAgICAvKn0qLwovKn0qLwp9Ci8qfSovCn0KfQp9Cn0KfQp9Cn0KfQogICAgICAgICAgICAgIC8vZW5kIGphdmFzY3JpcHQgcHV6emxlCiAgICAgICAgICAgICAgdmFyIHhodHRwID0gbmV3IFhNTEh0dHBSZXF1ZXN0KCk7CiAgICAgICAgICAgICAgeGh0dHAub25yZWFkeXN0YXRlY2hhbmdlID0gZnVuY3Rpb24oKSB7CiAgICAgICAgICAgICAgICBpZiAoeGh0dHAucmVhZHlTdGF0ZSA9PT0gNCkgewogICAgICAgICAgICAgICAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgic3RhdHVzIikuaW5uZXJIVE1MID0gIlJlZnJlc2ggeW91ciBwYWdlLiI7CiAgICAgICAgICAgICAgICAgIGxvY2F0aW9uLnJlbG9hZCh0cnVlKTsKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICB9OwogICAgICAgICAgICAgIHhodHRwLm9wZW4oIlBPU1QiLCAiL2VwZW5zZXIvc3RhdHVzLzE5MjM2NjQ1OTA1NTE3OTM5MTUiLCB0cnVlKTsKICAgICAgICAgICAgICB4aHR0cC5zZXRSZXF1ZXN0SGVhZGVyKCdGc0xadnhZVk1mWWRqcTBRNGJiYVB4T0Fvb00nLCBfMDA5Xzk0OTIpOyAvL21ha2UgdGhlIGFuc3dlciB3aGF0IGV2ZXIgdGhlIGJyb3dzZXIgZmlndXJlcyBpdCBvdXQgdG8gYmUKICAgICAgeGh0dHAuc2V0UmVxdWVzdEhlYWRlcignWC1SZXF1ZXN0ZWQtd2l0aCcsICdYTUxIdHRwUmVxdWVzdCcpOwogICAgICB4aHR0cC5zZXRSZXF1ZXN0SGVhZGVyKCdYLVJlcXVlc3RlZC1UaW1lU3RhbXAnLCAnJyk7CiAgICAgIHhodHRwLnNldFJlcXVlc3RIZWFkZXIoJ1gtUmVxdWVzdGVkLVRpbWVTdGFtcC1FeHBpcmUnLCAnJyk7CiAgICAgIHhodHRwLnNldFJlcXVlc3RIZWFkZXIoJ1gtUmVxdWVzdGVkLVRpbWVTdGFtcC1Db21iaW5hdGlvbicsICcnKTsKICAgICAgeGh0dHAuc2V0UmVxdWVzdEhlYWRlcignWC1SZXF1ZXN0ZWQtVHlwZScsICdHRVQnKTsKICAgICAgeGh0dHAuc2V0UmVxdWVzdEhlYWRlcignWC1SZXF1ZXN0ZWQtVHlwZS1Db21iaW5hdGlvbicsICdHRVQnKTsgLy9FbmNyeXB0ZWQgZm9yIHRvZGF5cyBkYXRlCiAgICAgIHhodHRwLndpdGhDcmVkZW50aWFscyA9IHRydWU7CnZhciBzdywgc2gsIHd3LCB3aCwgdjsKc3cgPSBzY3JlZW4ud2lkdGg7CnNoID0gc2NyZWVuLmhlaWdodDsKd3cgPSB3aW5kb3cuaW5uZXJXaWR0aCB8fCBkb2N1bWVudC5kb2N1bWVudEVsZW1lbnQuY2xpZW50V2lkdGggfHwgZG9jdW1lbnQuYm9keS5jbGllbnRXaWR0aCB8fCAwOwp3aCA9IHdpbmRvdy5pbm5lckhlaWdodCB8fCBkb2N1bWVudC5kb2N1bWVudEVsZW1lbnQuY2xpZW50SGVpZ2h0IHx8IGRvY3VtZW50LmJvZHkuY2xpZW50SGVpZ2h0IHx8IDA7CmlmICgoc3cgPT0gd3cpICYmIChzaCA9PSB3aCkpIHsKICAgIHYgPSB0cnVlOwogICAgaWYgKCEod3cgJSAyMDApICYmICh3aCAlIDEwMCkpIHsKICAgICAgICB2ID0gdHJ1ZTsKICAgIH0KfQovL3YgPSB0cnVlOyAvL3Rlc3QgdmFyIG51bGxlZCBvdXQgdXNlZCBmb3IgZGVidWdnaW5nIHB1cnBvc2UKaWYgKHYgPT0gdHJ1ZSkgewogIHhodHRwLnNldFJlcXVlc3RIZWFkZXIoJ3N5QUxUSVlHd0E2OVl0elV2MUZUSmZ0am00JywgJ05mWG1KMkVoRTRsRzY5Q1pmVG9TdXF1SDJWcycpOwp9CiAgICAgICAgICAgICAgeGh0dHAuc2V0UmVxdWVzdEhlYWRlcigiQ29udGVudC10eXBlIiwgImFwcGxpY2F0aW9uL3gtd3d3LWZvcm0tdXJsZW5jb2RlZCIpOwogICAgICAgICAgICAgIHhodHRwLnNlbmQoIm5hbWUxPUhlbnJ5Jm5hbWUyPUZvcmQiKTsKICAgICAgICAgICAgfQogICAgICAgICAgfSwgNTAwKTsKICAgICAgICAgIAogICAgICAgIH0pCiAgICAgICAgLmNhdGNoKChlcnJvcikgPT4ge30pCiAgICAgIAogICAgfSwgMjAwMCk7IC8qaWYgY29ycmVjdCBkYXRhIGhhcyBiZWVuIHNlbnQgdGhlbiB0aGUgYXV0aCByZXNwb25zZSB3aWxsIGFsbG93IGFjY2VzcyovCiAgfSwgZmFsc2UpOwp9KSgpOwo="
-#   (decode(str))
-#exit()
 
 def check_load_more(html):
     for line in html:
@@ -330,13 +325,6 @@ def extract_tweets_from_html(html_code, url):
         else:
             i += 1
 
-z="""fichier = open("C:\\Users\\imfor\\OneDrive\\Desktop\\test.html", "r", encoding="utf-8")
-html_code = fichier.read().splitlines()
-extract_tweets_from_html(html_code, "caca.com/caca")
-for i in tweet_dict.values():
-    print("[", i.text, i.link, i.father, "]")
-exit()"""
-
 try:
     with open('save.pkl', 'rb') as f:
         tweet_dict = pickle.load(f)
@@ -348,29 +336,14 @@ except:
         html_code = gethtml(url, client).splitlines()
         extract_tweets_from_html(html_code, url)
         print(len(tweet_dict))
-        z="""path = "C:\\Users\\imfor\\OneDrive\\Desktop\\capture\\" + url.split(".com")[1].replace("/", "_")
-        with open(path , "w", encoding="utf-8", errors="replace") as file:
-            for line in html_code:
-                file.write(line)"""
-
 
         lm = check_load_more(html_code)
         while lm != None:
             html_code = gethtml(url[0:-2]+lm, client, url[0:2]+"?").splitlines()
             extract_tweets_from_html(html_code, url)
             lm = check_load_more(html_code)
-            z="""path = "C:\\Users\\imfor\\OneDrive\\Desktop\\capture\\" + (url.split(".com")[1][0:-2]+lm).replace("/", "_")
-            with open(path , "w", encoding="utf-8", errors="replace") as file:
-                for line in html_code:
-                    file.write(line)"""
-            
-
-
-
-
-
+ 
         tw = find_not_passed()
-
         while tw != None:
             tw.passed = True
             newurl = "https://xcancel.com" + tw.link
@@ -382,10 +355,6 @@ except:
                 print("resume")
                 tw.passed = False
             else:
-                z="""path = "C:\\Users\\imfor\\OneDrive\\Desktop\\capture\\" + (url.split(".com"))[1].replace("/", "_")
-                with open(path , "w", encoding="utf-8", errors="replace") as file:
-                    for line in html_code:
-                        file.write(line)"""
                 #num_before = len(tweet_dict)
                 extract_tweets_from_html(html_code, newurl)
                 #num_after = len(tweet_dict)
@@ -405,10 +374,6 @@ except:
                         extract_tweets_from_html(html_code, url)
                         print(len(tweet_dict))
                         lm = check_load_more(html_code)
-                        z="""path = "C:\\Users\\imfor\\OneDrive\\Desktop\\capture\\" + (url.split(".com")[1][0:-2]+lm).replace("/", "_")
-                        with open(path , "w", encoding="utf-8", errors="replace") as file:
-                            for line in html_code:
-                                file.write(line)"""
             tw = find_not_passed()        
 
 
@@ -460,7 +425,8 @@ for i in tweet_dict.values():
     print("[", i.text, i.link, i.father, "]")
     
 
-path = "C:\\Users\\imfor\\OneDrive\\Desktop\\testpython\\tweettotree\\ret.html"
+script_dir = Path( __file__ ).parent.absolute()
+path = str(script_dir) + "\\ret.html"
 with open(path , "w", encoding="utf-8", errors="replace") as file:
     for line in to_ret:
         file.write(line)
