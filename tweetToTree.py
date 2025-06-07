@@ -10,7 +10,7 @@ from copy import copy
 from pathlib import Path
 
 class tweet:
-    def __init__(self, link, text, username, nquote, nlike, nretweet, nreply, father=""):
+    def __init__(self, link, text, username, nquote, nlike, nretweet, nreply, father="", img=None, video=None):
         self.father = father
         self.link = link
         self.text = text
@@ -20,6 +20,8 @@ class tweet:
         self.nretweet = nretweet
         self.nreply = nreply
         self.passed = False
+        self.img = img
+        self.video = video
         self.reply = []
         self.x = 0
         self.y = 0
@@ -65,14 +67,19 @@ def create_html(tweet_dict):
                 maxx = tweet_dict[i].x*250
             if maxy < tweet_dict[i].y*400:
                 maxy = tweet_dict[i].y*400
-            to_ret += '<div class="boite" data-x="' + str(tweet_dict[i].x*250) + '" data-y="'+str(tweet_dict[i].y*400)+'" data-color="#' + hex(users[tweet_dict[i].username][0])[2:] + hex(users[tweet_dict[i].username][1])[2:] + hex(users[tweet_dict[i].username][2])[2:] + '">'+ tweet_dict[i].username + " : " + tweet_dict[i].text + " - " + str(tweet_dict[i].nlike) + '</div>\n'
+            if tweet_dict[i].video != None:
+                to_ret += '<div class="boite" data-x="' + str(tweet_dict[i].x*250) + '" data-y="'+str(tweet_dict[i].y*400)+'" data-color="#' + hex(users[tweet_dict[i].username][0])[2:] + hex(users[tweet_dict[i].username][1])[2:] + hex(users[tweet_dict[i].username][2])[2:] + '">'+ tweet_dict[i].username + " : " + tweet_dict[i].text + " - " + str(tweet_dict[i].nlike) + '<video poster="" controls="" style="width: 110px; height: 70px;">' + tweet_dict[i].video +'</video></div>\n'
+            elif tweet_dict[i].img != None:
+                to_ret += '<div class="boite" data-x="' + str(tweet_dict[i].x*250) + '" data-y="'+str(tweet_dict[i].y*400)+'" data-color="#' + hex(users[tweet_dict[i].username][0])[2:] + hex(users[tweet_dict[i].username][1])[2:] + hex(users[tweet_dict[i].username][2])[2:] + '">'+ tweet_dict[i].username + " : " + tweet_dict[i].text + " - " + str(tweet_dict[i].nlike) + '<a href="' + tweet_dict[i].img + '" target="_blank"> <img src="' + tweet_dict[i].img + '" alt="Aperçu" style="width: 40px; height: 40px;"> </a></div>\n'
+            else:
+                to_ret += '<div class="boite" data-x="' + str(tweet_dict[i].x*250) + '" data-y="'+str(tweet_dict[i].y*400)+'" data-color="#' + hex(users[tweet_dict[i].username][0])[2:] + hex(users[tweet_dict[i].username][1])[2:] + hex(users[tweet_dict[i].username][2])[2:] + '">'+ tweet_dict[i].username + " : " + tweet_dict[i].text + " - " + str(tweet_dict[i].nlike) + '</div>\n'             
         else:
             print("https://xcancel.com"+tweet_dict[i].link)
     to_ret += '<svg width="' + str(maxx) + '" height="' + str(maxy) + '" style="border:2px solid black;">'
     for i in tweet_dict.values():
         if i.father != i.link: 
             j = tweet_dict[i.father]
-            to_ret += '<line x1="'+str(i.x*250+125)+'" y1="'+str(i.y*400)+'" x2="'+str(j.x*250+125)+'" y2="'+str(j.y*400+333)+'" stroke="blue" stroke-width="2" />'
+            to_ret += '<line x1="'+str(i.x*250+125)+'" y1="'+str(i.y*400)+'" x2="'+str(j.x*250+125)+'" y2="'+str(j.y*400+333)+'" stroke="blue" stroke-width="2" />\n'
     to_ret += '</svg>'
 
 
@@ -246,7 +253,6 @@ def extract_tweets_from_html(html_code, url):
         if cond == -1:
             cond = html_code[i].find('<div id="m" class="main-tweet"')
         if cond != -1:
-            print("[", i+1,"]")
             cnt = html_code[i].count('<div', cond)
             cnt -= html_code[i].count('</div', cond)
             text = ""
@@ -257,6 +263,8 @@ def extract_tweets_from_html(html_code, url):
             nretweet = -1
             nquote = -1
             links = []
+            img = None
+            video = None
             i += 1
             while cnt > 0:
                 cnt += html_code[i].count('<div')
@@ -305,6 +313,14 @@ def extract_tweets_from_html(html_code, url):
                     nquote = html_code[i][debut:fin]
                     if nquote == "":
                         nquote = 0
+                if '<div class="attachment image">' in html_code[i]:
+                    debut = html_code[i].find('href="') + 6
+                    fin = html_code[i].find('"', debut)
+                    img = html_code[i][debut:fin]
+                if '<div class="attachment video-container">' in html_code[i]:
+                    debut = html_code[i].find('<source src=')
+                    fin = html_code[i].find('</video>', debut)
+                    video = html_code[i][debut:fin]
                 if nlike == -1 and "icon-heart" in html_code[i]:
                     debut = html_code[i].find('</span>') + 7
                     fin = html_code[i].find('</div></span>', debut)
@@ -315,7 +331,7 @@ def extract_tweets_from_html(html_code, url):
             if tweetlink != "":
                 #print(tweetlink, text,  url.split(".com")[1])
                 if tweetlink not in tweet_dict:
-                    tweet_dict[tweetlink] = tweet(tweetlink, text, username, nquote, nlike, nretweet, nreply, url.split(".com")[1])
+                    tweet_dict[tweetlink] = tweet(tweetlink, text, username, nquote, nlike, nretweet, nreply, url.split(".com")[1], img, video)
                     if len(tweet_dict) == 1:
                         tweet_dict[tweetlink].passed = True
                 elif after == 2:
@@ -325,61 +341,61 @@ def extract_tweets_from_html(html_code, url):
         else:
             i += 1
 
-try:
-    with open('save.pkl', 'rb') as f:
-        tweet_dict = pickle.load(f)
-except:
-    transport = httpx.HTTPTransport(http2=True,proxy="http://localhost:8080", verify=False)
-    with httpx.Client(transport=transport, http2=True, timeout=10) as client:
+#except:
+    #if you want use a proxy
+    #transport = httpx.HTTPTransport(http2=True,proxy="http://localhost:8080", verify=False) 
+    #with httpx.Client(transport=transport, http2=True, timeout=10) as client:
 
-        url = input ("url:")
-        html_code = gethtml(url, client).splitlines()
+with httpx.Client(http2=True, timeout=10) as client:
+
+    url = input ("url:")
+    if "x.com" in url:
+        x = url.find("x.com")
+        newurl = url[:x+1] + "cancel" + url[x+1:]
+        url = newurl
+    html_code = gethtml(url, client).splitlines()
+    extract_tweets_from_html(html_code, url)
+    print(len(tweet_dict))
+
+    lm = check_load_more(html_code)
+    while lm != None:
+        html_code = gethtml(url[0:-2]+lm, client, url[0:2]+"?").splitlines()
         extract_tweets_from_html(html_code, url)
-        print(len(tweet_dict))
-
         lm = check_load_more(html_code)
-        while lm != None:
-            html_code = gethtml(url[0:-2]+lm, client, url[0:2]+"?").splitlines()
-            extract_tweets_from_html(html_code, url)
+
+    tw = find_not_passed()
+    while tw != None:
+        tw.passed = True
+        newurl = "https://xcancel.com" + tw.link
+        try:
+            html_code = gethtml(newurl, client).splitlines()
+        except:
+            print("fail sleep 300")
+            time.sleep(300)
+            print("resume")
+            tw.passed = False
+        else:
+            #num_before = len(tweet_dict)
+            extract_tweets_from_html(html_code, newurl)
+            #num_after = len(tweet_dict)
+            #if num_after - num_before < tw.nreply:
+                #print("AHHHHHHHHHHHHHHHHH")
+                #tw.passed = False
+            print(len(tweet_dict))
             lm = check_load_more(html_code)
- 
-        tw = find_not_passed()
-        while tw != None:
-            tw.passed = True
-            newurl = "https://xcancel.com" + tw.link
-            try:
-                html_code = gethtml(newurl, client).splitlines()
-            except:
-                print("fail sleep 540")
-                time.sleep(540)
-                print("resume")
-                tw.passed = False
-            else:
-                #num_before = len(tweet_dict)
-                extract_tweets_from_html(html_code, newurl)
-                #num_after = len(tweet_dict)
-                #if num_after - num_before < tw.nreply:
-                    #print("AHHHHHHHHHHHHHHHHH")
-                    #tw.passed = False
-                print(len(tweet_dict))
-                lm = check_load_more(html_code)
-                while lm != None:
-                    try:
-                        html_code = gethtml(url[0:-2]+lm, client,newurl[0:-2]+"?").splitlines()
-                    except:
-                        print("fail sleep 540")
-                        time.sleep(540)
-                        print("resume")
-                    else:
-                        extract_tweets_from_html(html_code, url)
-                        print(len(tweet_dict))
-                        lm = check_load_more(html_code)
-            tw = find_not_passed()        
+            while lm != None:
+                try:
+                    html_code = gethtml(url[0:-2]+lm, client,newurl[0:-2]+"?").splitlines()
+                except:
+                    print("fail sleep 300")
+                    time.sleep(300)
+                    print("resume")
+                else:
+                    extract_tweets_from_html(html_code, url)
+                    print(len(tweet_dict))
+                    lm = check_load_more(html_code)
+        tw = find_not_passed()        
 
-
-# Sauvegarde
-with open('save.pkl', 'wb') as f:
-    pickle.dump(tweet_dict, f)
 
 print(len(tweet_dict))
 
@@ -421,8 +437,8 @@ to_ret += """<script>
 </body>
 </html>"""
 
-for i in tweet_dict.values():
-    print("[", i.text, i.link, i.father, "]")
+#for i in tweet_dict.values():
+#    print("[", i.text, i.link, i.father, "]")
     
 
 script_dir = Path( __file__ ).parent.absolute()
